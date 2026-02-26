@@ -37,10 +37,28 @@ int main() {
     if (action == "ADD" or action == "a") {
 
       //Add
+      cout << "Add what number? ";
+      int num;
+      cin >> num;
+
+      cout << "Adding..." << endl;
+      
+      tree->insert(num);
+
+      cout << "Done" << endl;
     }
     else if (action == "DELETE" or action == "d") {
 
       //Delete
+      cout << "Remove what number? ";
+      int num;
+      cin >> num;
+
+      cout << "Deleting..." << endl;
+
+      tree->remove(num);
+
+      cout << "Done" << endl;
     }
     else if (action == "PRINT" or action == "p") {
 

@@ -24,6 +24,22 @@ struct BST {
   //RECURSIVE DELETE
   ~BST() { delete head; }
 
+  //Min, succ, and search ripped off from wikipedia
+  Node* min(Node* v) {
+
+    while (v->left != nullptr) { v = v->left; }
+    return v;
+  }
+  
+  Node* succ(Node* v) {
+
+    if (v->right != nullptr) { return this->min(v->right); }
+
+    y = x->parent;
+    while (y != nullptr and x == y->right) { x = y; y = y->parent; }
+    return y;
+  }
+  
   Node* search(int v) {
 
     Node* t = head;
@@ -32,12 +48,32 @@ struct BST {
       if (v < t->data) { t = t->left; }
       else { t = t->right; }
     }
+
+    if (t->data != v) { cout << "Not in tree" << endl; return new Node(-1); }
+    
     return t;
   }
   
   void insert(int v) {
 
-    return
+    if (this->search(v)->data != -1) { cout << "Already in tree" << endl; return; }
+
+    Node* newVal = new Node(v)
+    
+    y = nullptr;
+    x = head;
+
+    while (x != nullptr) {
+      y = x;
+
+      if (newVal->data < x->data) { x = x->left; }
+      else { x = x->right; }
+    }
+
+    newVal->parent = y;
+    if (y == nullptr) { head = newVal; }
+    else if (newVal->data < y->data) { y->left = newVal; }
+    else { y->right = newVal; }
   }
 
   void remove(int v) {
@@ -53,10 +89,57 @@ struct BST {
       delete del;
     }
     //One child
-    else if (del->left == nullptr ^ del->right == nullptr) {
+    else if (del->left == nullptr or del->right == nullptr) {
 
+      Node* correctParentSide = (del->parent->left == del) ? del->parent->left : del->parent->right;
+      Node* correctDelSide = (del->left == nullptr) ? del->right : del->left;
       
-    
+      //Fix new node's parent
+      correctDelSide->parent = del->parent;
+
+      //Fix parent nodes child
+      correctParentSide == correctDelSide;
+
+      //Cleanup
+      correctDelSide = nullptr;
+      delete del;
+    }
+    //Two children
+    else {
+
+      Node* succ = this->succ(del);
+      
+      //Succ is right child
+      if (succ == del->right) {
+
+	succ->left = del->left;
+	succ->parent = del->parent;
+	del->parent->left == del ? succ->parent->left : succ->parent->right = succ;
+      }
+
+      //Succ is in del's subtree
+      else {
+
+	succ->left = del->left;
+	succ->right = del->right;
+	succ->parent = del->parent;
+	del->parent->left == del ? succ->parent->left : succ->parent->right = succ;
+      }
+    }
+  }
+
+  void print(Node* i = head, int indent) {
+
+    if (i->right != nullptr) { print(i->right, indent + 1); }
+
+    for (int j = 0; j < indent; j++) { cout << "\t"; }
+
+    if (i->data < 100) { cout << "0"; }
+    else if (i->data < 10) { cout << "00"; }
+    cout << i->data << endl;
+
+    if (i->left != nullptr) { print(i->left, indent + 1); }
+  }
 };
 
 #endif
