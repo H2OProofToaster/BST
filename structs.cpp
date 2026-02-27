@@ -121,10 +121,29 @@ struct BST {
       //Succ is in del's subtree
       else {
 
+	//Fix del's parent's child
+	del->parent->left == del ? del->parent->left : del->parent->right = succ;
+
+	//No child succ
+	if (succ->left == nullptr and succ->right == nullptr) {
+
+	  //Fix succ's old parent
+	  succ->parent->left == succ ? succ->parent->left : succ->parent->right = nullptr;
+	}
+	//One child succ
+	else if (succ->left == nullptr or succ->right == nullptr) {
+
+	  //Fix succ's old parent
+	  succ->paret->left == succ ? succ->parent->left : succ->parent->right = succ->right;
+	}
+
+	//Cleanup
 	succ->left = del->left;
 	succ->right = del->right;
 	succ->parent = del->parent;
-	del->parent->left == del ? succ->parent->left : succ->parent->right = succ;
+	del->left = nullptr;
+	del->right = nullptr;
+	delete del;
       }
     }
   }
