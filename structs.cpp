@@ -91,17 +91,18 @@ struct BST {
     //One child
     else if (del->left == nullptr or del->right == nullptr) {
 
-      Node* correctParentSide = (del->parent->left == del) ? del->parent->left : del->parent->right;
-      Node* correctDelSide = (del->left == nullptr) ? del->right : del->left;
+      Node* fixNode = (del->left == nullptr) ? del->right : del->left;
+
+      fixNode->parent = del->parent;
+
+      //del is left child
+      if (del->parent->left = del) { del->parent->left = fixNode; }
+      //del is right child
+      else { del->parent->right = fixNode; }
       
-      //Fix new node's parent
-      correctDelSide->parent = del->parent;
-
-      //Fix parent nodes child
-      correctParentSide == correctDelSide;
-
       //Cleanup
-      correctDelSide = nullptr;
+      if (del->left == nullptr) { del->right = nullptr; }
+      else { del->left = nullptr; }
       delete del;
     }
     //Two children
@@ -136,6 +137,14 @@ struct BST {
 
     for (int j = 0; j < indent; j++) { cout << "\t"; }
 
+    if (i->parent != nullptr) {
+
+      cout << "(";
+      if (i->parent->data < 100) { cout << "0"; }
+      if (i->parent->data < 10) { cout << "00"; }
+      cout << i->parent->data;
+      cout << ")";
+    }
     if (i->data < 100) { cout << "0"; }
     else if (i->data < 10) { cout << "00"; }
     cout << i->data << endl;
