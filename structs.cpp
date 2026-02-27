@@ -1,6 +1,10 @@
 #ifndef STRUCTS_CPP
 #define STRUCTS_CPP
 
+#include <iostream>
+
+using namespace std;
+
 struct Node {
 
   int data;
@@ -9,7 +13,7 @@ struct Node {
   Node* parent = nullptr;
 
   Node() {}
-  Node(d) : data(d) {}
+  Node(int d) : data(d) {}
 
   ~Node() { delete left; delete right; }
 };
@@ -35,8 +39,8 @@ struct BST {
 
     if (v->right != nullptr) { return this->min(v->right); }
 
-    y = x->parent;
-    while (y != nullptr and x == y->right) { x = y; y = y->parent; }
+    Node* y = v->parent;
+    while (y != nullptr and v == y->right) { v = y; y = y->parent; }
     return y;
   }
   
@@ -48,20 +52,16 @@ struct BST {
       if (v < t->data) { t = t->left; }
       else { t = t->right; }
     }
-
-    if (t->data != v) { cout << "Not in tree" << endl; return new Node(-1); }
     
     return t;
   }
   
   void insert(int v) {
 
-    if (this->search(v)->data != -1) { cout << "Already in tree" << endl; return; }
-
-    Node* newVal = new Node(v)
+    Node* newVal = new Node(v);
     
-    y = nullptr;
-    x = head;
+    Node* y = nullptr;
+    Node* x = head;
 
     while (x != nullptr) {
       y = x;
@@ -128,9 +128,11 @@ struct BST {
     }
   }
 
-  void print(Node* i = head, int indent) {
+  void print(int indent = 0, Node* i = nullptr) {
 
-    if (i->right != nullptr) { print(i->right, indent + 1); }
+    if (i == nullptr) { i = head; }
+    
+    if (i->right != nullptr) { print(indent + 1, i->right); }
 
     for (int j = 0; j < indent; j++) { cout << "\t"; }
 
@@ -138,7 +140,7 @@ struct BST {
     else if (i->data < 10) { cout << "00"; }
     cout << i->data << endl;
 
-    if (i->left != nullptr) { print(i->left, indent + 1); }
+    if (i->left != nullptr) { print(indent + 1, i->left); }
   }
 };
 

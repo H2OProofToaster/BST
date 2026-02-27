@@ -30,7 +30,7 @@ int main() {
   //Do actions
   while (running) {
 
-    cout << "What is your action? (ADD, DELETE, PRINT, QUIT)" << endl;
+    cout << "What is your action? (ADD, DELETE, SEARCH, PRINT, QUIT)" << endl;
     string action;
     cin >> action;
 
@@ -60,9 +60,27 @@ int main() {
 
       cout << "Done" << endl;
     }
+    else if (action == "SEARCH" or action == "s") {
+
+      //Search
+      cout << "Search what number? ";
+      int num;
+      cin >> num;
+
+      cout << "Searching..." << endl;
+
+      Node* search = tree->search(num);
+      if (search->data != -1) { cout << "Found" << endl; }
+      else { cout << "Not found" << endl; }
+    }
     else if (action == "PRINT" or action == "p") {
 
       //Print
+      cout << "Printing..." << endl << endl;
+
+      tree->print();
+
+      cout << endl << "Done" << endl;
     }
     else if (action == "QUIT" or action == "q") {
 
