@@ -37,11 +37,11 @@ struct BST {
   
   Node* succ(Node* v) {
 
-    if (v->right != nullptr) { return this->min(v->right); }
+    v = v->right;
 
-    Node* y = v->parent;
-    while (y != nullptr and v == y->right) { v = y; y = y->parent; }
-    return y;
+    while (v->left != nullptr) { v = v->left; }
+
+    return v;
   }
   
   Node* search(int v) {
@@ -79,7 +79,7 @@ struct BST {
   void remove(int v) {
 
     Node* del = this->search(v);
-
+    
     //Leaf
     if (del->left == nullptr and del->right == nullptr) {
 
@@ -88,21 +88,32 @@ struct BST {
 
       delete del;
     }
-    //One child
-    else if (del->left == nullptr or del->right == nullptr) {
+    //One child (left)
+    else if (del->right == nullptr) {
 
-      Node* fixNode = (del->left == nullptr) ? del->right : del->left;
-
-      fixNode->parent = del->parent;
+      //Fix parent
+      del->left->parent = del->parent;
 
       //del is left child
-      if (del->parent->left = del) { del->parent->left = fixNode; }
+      if (del->parent->left == del) { del->parent->left = del->left; }
       //del is right child
-      else { del->parent->right = fixNode; }
+      else { del->parent->right = del->left; }
       
       //Cleanup
-      if (del->left == nullptr) { del->right = nullptr; }
-      else { del->left = nullptr; }
+      del->left = nullptr;
+      delete del;
+    }
+    //One child (right)
+    else if (del->left == nullptr) {
+
+      //Same as left (just, right)
+
+      del->right->parent = del->parent;
+
+      if (del->parent->left == del) { del->parent->left = del->right; }
+      else  { del->parent->right = del->right; }
+
+      del->left = nullptr;
       delete del;
     }
     //Two children
@@ -115,31 +126,46 @@ struct BST {
 
 	succ->left = del->left;
 	succ->parent = del->parent;
-	del->parent->left == del ? succ->parent->left : succ->parent->right = succ;
+	if (del->parent->left == del) { succ->parent->left = succ; }
+	else { succ->parent->right == succ; }
       }
 
       //Succ is in del's subtree
       else {
 
 	//Fix del's parent's child
-	del->parent->left == del ? del->parent->left : del->parent->right = succ;
+	if (del->parent->left == del) { del->parent->left = succ; }
+	else { del->parent->right = succ; }
 
 	//No child succ
 	if (succ->left == nullptr and succ->right == nullptr) {
 
 	  //Fix succ's old parent
-	  succ->parent->left == succ ? succ->parent->left : succ->parent->right = nullptr;
+	  if (succ->parent->left == succ) { succ->parent->left = nullptr; }
+	  else { succ->parent->right = nullptr; }
 	}
+	
 	//One child succ
-	else if (succ->left == nullptr or succ->right == nullptr) {
+	else {
 
 	  //Fix succ's old parent
-	  succ->paret->left == succ ? succ->parent->left : succ->parent->right = succ->right;
-	}
+	  if (succ->parent->left == succ) {
 
+	    succ->parent->left = succ->right;
+	    succ->right->parent = succ->parent;
+	  }
+	  else {
+
+	    succ->parent->right = succ->right;
+	    succ->right->parent = succ->parent;
+	  }
+	}
+  
 	//Cleanup
 	succ->left = del->left;
+	succ->left->parent = succ;
 	succ->right = del->right;
+	succ->right->parent = succ;
 	succ->parent = del->parent;
 	del->left = nullptr;
 	del->right = nullptr;
