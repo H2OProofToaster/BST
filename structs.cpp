@@ -58,22 +58,22 @@ struct BST {
   
   void insert(int v) {
 
-    Node* newVal = new Node(v);
-    
+    Node* z = new Node(v);
     Node* y = nullptr;
     Node* x = head;
 
     while (x != nullptr) {
-      y = x;
 
-      if (newVal->data < x->data) { x = x->left; }
+      y = x;
+      if (v < x->data) { x = x->left; }
       else { x = x->right; }
     }
 
-    newVal->parent = y;
-    if (y == nullptr) { head = newVal; }
-    else if (newVal->data < y->data) { y->left = newVal; }
-    else { y->right = newVal; }
+    z->parent = y;
+
+    if (y == nullptr) { head = z; }
+    else if (v < y->data) { y->left = z; }
+    else { y->right = z; }
   }
 
   void remove(int v) {
@@ -113,7 +113,7 @@ struct BST {
       if (del->parent->left == del) { del->parent->left = del->right; }
       else  { del->parent->right = del->right; }
 
-      del->left = nullptr;
+      del->right = nullptr;
       delete del;
     }
     //Two children
@@ -178,7 +178,7 @@ struct BST {
 
     if (i == nullptr) { i = head; }
     
-    if (i->right != nullptr) { print(indent + 1, i->right); }
+    if (i->right != nullptr) { this->print(indent + 1, i->right); }
 
     for (int j = 0; j < indent; j++) { cout << "\t"; }
 
@@ -194,7 +194,7 @@ struct BST {
     else if (i->data < 10) { cout << "00"; }
     cout << i->data << endl;
 
-    if (i->left != nullptr) { print(indent + 1, i->left); }
+    if (i->left != nullptr) { this->print(indent + 1, i->left); }
   }
 };
 

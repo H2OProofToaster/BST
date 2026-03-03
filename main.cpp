@@ -9,28 +9,10 @@ int main() {
   bool running = true;
   BST* tree = new BST();
   
-  //Read in from file
-  cout << "What file? ";
-
-  string fileName;
-  cin >> fileName;
-
-  cout << "Reading..." << endl;
-  
-  ifstream readFile(fileName);
-  if (readFile.is_open()) {
-
-    int v;
-    while (readFile >> v) { tree->insert(v); }
-  }
-  readFile.close();
-
-  cout << "Done" << endl;
-
   //Do actions
   while (running) {
 
-    cout << "What is your action? (ADD, DELETE, SEARCH, PRINT, QUIT)" << endl;
+    cout << "What is your action? (ADD, READ, DELETE, SEARCH, PRINT, QUIT)" << endl;
     string action;
     cin >> action;
 
@@ -46,6 +28,28 @@ int main() {
       tree->insert(num);
 
       cout << "Done" << endl;
+    }
+    else if (action == "READ" or action == "r") {
+
+      //Read
+      cout << "What file? (Files are not guaranteed to have unique values between them, QUIT to stop reading) ";
+
+      string fileName;
+      cin >> fileName;
+
+      if (fileName != "QUIT" or fileName != "q") { 
+	cout << "Reading..." << endl;
+	
+	ifstream readFile(fileName);
+	if (readFile.is_open()) {
+	  
+	  int v;
+	  while (readFile >> v) { tree->insert(v); }
+	}
+	readFile.close();
+	
+	cout << "Done" << endl;
+      }
     }
     else if (action == "DELETE" or action == "d") {
 
