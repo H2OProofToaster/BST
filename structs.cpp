@@ -20,7 +20,7 @@ struct Node {
 
 struct BST {
 
-  Node* head;
+  Node* head = nullptr;
 
   BST() {}
   //BST(BST* i) { this->insert(i); }
@@ -60,7 +60,7 @@ struct BST {
 
     Node* z = new Node(v);
     Node* y = nullptr;
-    Node* x = head;
+    Node* x = this->head;
 
     while (x != nullptr) {
 
