@@ -22,7 +22,7 @@ struct BST {
 
   Node* head = nullptr;
 
-  BST() {}
+  BST() { /*cout << "Head: " << head << endl; */}
   //BST(BST* i) { this->insert(i); }
 
   //RECURSIVE DELETE
