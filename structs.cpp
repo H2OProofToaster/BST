@@ -79,26 +79,48 @@ struct BST {
   void remove(int v) {
 
     Node* del = this->search(v);
-    
+
     //Leaf
     if (del->left == nullptr and del->right == nullptr) {
 
-      if (del->parent->left == del) { del->parent->left = nullptr; }
-      else { del->parent->right = nullptr; }
+      if (del->parent != nullptr) {
+	
+	if (del->parent->left == del) { del->parent->left = nullptr; }
+	else { del->parent->right = nullptr; }
+      }
 
+      if (del == head) { head = nullptr; }
       delete del;
+    }
+    //One child root
+    else if (del->right == nullptr or del->left == nullptr and del->parent == nullptr) {
+
+      //Left
+      if (del->right == nullptr) {
+
+	head = del->left;
+	del->left = nullptr;
+	delete del;
+      }
+      //Right
+      else {
+
+	head = del->right;
+	del->right = nullptr;
+	delete del;
+      }
     }
     //One child (left)
     else if (del->right == nullptr) {
-
+	
       //Fix parent
       del->left->parent = del->parent;
-
+	
       //del is left child
       if (del->parent->left == del) { del->parent->left = del->left; }
       //del is right child
       else { del->parent->right = del->left; }
-      
+	
       //Cleanup
       del->left = nullptr;
       delete del;
@@ -115,6 +137,54 @@ struct BST {
 
       del->right = nullptr;
       delete del;
+    }
+    //Two children root
+    else if (del == head) {
+
+      Node* succ = this->succ(del);
+
+      //Succ is right child
+      if (succ == del->right) {
+
+	succ->left = del->left;
+	succ->parent = nullptr;
+      }
+
+      //Succ in del's subtree
+      else {
+
+	//No child succ
+	if (succ->left == nullptr and succ->right == nullptr) {
+
+	  //Fix succ's old parent
+	  if (succ->parent->left == succ) { succ->parent->left = nullptr; }
+	  else { succ->parent->right == nullptr; }
+	}
+
+	//One child succ
+	else {
+
+	  //Fix succ's old parent
+	  if (succ->parent->left == succ) {
+
+	    succ->parent->left = succ->right;
+	    succ->right->parent = succ->parent;
+	  }
+	  else {
+
+	    succ->parent->right = succ->right;
+	    succ->right->parent = succ->parent;
+	  }
+	}
+      }
+	//Cleanup
+	succ->left = del->left;
+	succ->left->parent = succ;
+	succ->right = del->right;
+	succ->right->parent = succ;
+        del->left = nullptr;
+	del->right = nullptr;
+	delete del;
     }
     //Two children
     else {
