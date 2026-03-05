@@ -52,7 +52,8 @@ struct BST {
       if (v < t->data) { t = t->left; }
       else { t = t->right; }
     }
-    
+
+    if (t == nullptr) { return new Node(-1); }
     return t;
   }
   
@@ -75,177 +76,129 @@ struct BST {
     else if (v < y->data) { y->left = z; }
     else { y->right = z; }
   }
-
+  
   void remove(int v) {
 
-    Node* del = this->search(v);
-
+    Node* remove = this->search(v);
+    if (remove->data == -1) { delete remove; return; }
+    
     //Leaf
-    if (del->left == nullptr and del->right == nullptr) {
+    if (remove->left == nullptr && remove->right == nullptr) {
 
-      if (del->parent != nullptr) {
-	
-	if (del->parent->left == del) { del->parent->left = nullptr; }
-	else { del->parent->right = nullptr; }
+      //Fix parents
+      if (remove->parent != nullptr) {
+
+	//Left child
+	if (remove->parent->left == remove) { remove->parent->left = nullptr; }
+	//Right child
+	else { remove->parent->right = nullptr; }
       }
+      //Root deletion
+      else { this->head = nullptr; }
 
-      if (del == head) { head = nullptr; }
-      delete del;
+      delete remove;
     }
-    //One child root
-    else if (del->right == nullptr or del->left == nullptr and del->parent == nullptr) {
+    //One child
+    else if (remove->left == nullptr ^ remove->right == nullptr) {
+
+      //Get correct child
+      Node* fix = nullptr;
 
       //Left
-      if (del->right == nullptr) {
-
-	head = del->left;
-	del->left = nullptr;
-	delete del;
-      }
+      if (remove->left != nullptr) { fix = remove->left; remove->left = nullptr; }
       //Right
-      else {
+      else { fix = remove->right; remove->right = nullptr;}
 
-	head = del->right;
-	del->right = nullptr;
-	delete del;
+      fix->parent = remove->parent;
+
+      //Fix parents
+      if (remove->parent != nullptr) {
+
+	if (remove->parent->left == remove) { remove->parent->left = fix; }
+	else { remove->parent->right = fix; }
       }
+      //Root deletion
+      else { this->head = fix; }
+
+      delete remove;
     }
-    //One child (left)
-    else if (del->right == nullptr) {
-	
-      //Fix parent
-      del->left->parent = del->parent;
-	
-      //del is left child
-      if (del->parent->left == del) { del->parent->left = del->left; }
-      //del is right child
-      else { del->parent->right = del->left; }
-	
-      //Cleanup
-      del->left = nullptr;
-      delete del;
-    }
-    //One child (right)
-    else if (del->left == nullptr) {
-
-      //Same as left (just, right)
-
-      del->right->parent = del->parent;
-
-      if (del->parent->left == del) { del->parent->left = del->right; }
-      else  { del->parent->right = del->right; }
-
-      del->right = nullptr;
-      delete del;
-    }
-    //Two children root
-    else if (del == head) {
-
-      Node* succ = this->succ(del);
-
-      //Succ is right child
-      if (succ == del->right) {
-
-	succ->left = del->left;
-	succ->parent = nullptr;
-      }
-
-      //Succ in del's subtree
-      else {
-
-	//No child succ
-	if (succ->left == nullptr and succ->right == nullptr) {
-
-	  //Fix succ's old parent
-	  if (succ->parent->left == succ) { succ->parent->left = nullptr; }
-	  else { succ->parent->right == nullptr; }
-	}
-
-	//One child succ
-	else {
-
-	  //Fix succ's old parent
-	  if (succ->parent->left == succ) {
-
-	    succ->parent->left = succ->right;
-	    succ->right->parent = succ->parent;
-	  }
-	  else {
-
-	    succ->parent->right = succ->right;
-	    succ->right->parent = succ->parent;
-	  }
-	}
-      }
-	//Cleanup
-	succ->left = del->left;
-	succ->left->parent = succ;
-	succ->right = del->right;
-	succ->right->parent = succ;
-        del->left = nullptr;
-	del->right = nullptr;
-	delete del;
-    }
-    //Two children
+    //Two child
     else {
 
-      Node* succ = this->succ(del);
-      
-      //Succ is right child
-      if (succ == del->right) {
+      Node* succ = this->succ(remove);
 
-	succ->left = del->left;
-	succ->parent = del->parent;
-	if (del->parent->left == del) { succ->parent->left = succ; }
-	else { succ->parent->right == succ; }
+      //Right child
+      if (remove->right == succ) {
+
+	succ->parent = remove->parent;
+
+	//Fix parents
+	if (remove->parent != nullptr) {
+
+	  if (remove->parent->left == remove) { remove->parent->left = succ; }
+	  else { remove->parent->right = succ; }
+	}
+	//Root deletion
+	else { this->head = succ; }
+
+	succ->left = remove->left;
+	succ->left->parent = succ;
+	
+	remove->left = nullptr;
+	remove->right = nullptr;
+
+	delete remove;
       }
-
-      //Succ is in del's subtree
+      //Right subtree
       else {
 
-	//Fix del's parent's child
-	if (del->parent->left == del) { del->parent->left = succ; }
-	else { del->parent->right = succ; }
+	//Succ replace
 
-	//No child succ
-	if (succ->left == nullptr and succ->right == nullptr) {
+	//Succ has subtree
+	if (succ->right != nullptr) {
+	  
+	  succ->right->parent = succ->parent;
 
-	  //Fix succ's old parent
+	  //Fix parents
+	  if (succ->parent->left == succ) { succ->parent->left = succ->right; }
+	  else { succ->parent->right = succ->right; }
+	}
+	//No subtree
+	else {
+
 	  if (succ->parent->left == succ) { succ->parent->left = nullptr; }
 	  else { succ->parent->right = nullptr; }
 	}
 	
-	//One child succ
-	else {
+	//Succ displace
 
-	  //Fix succ's old parent
-	  if (succ->parent->left == succ) {
-
-	    succ->parent->left = succ->right;
-	    succ->right->parent = succ->parent;
-	  }
-	  else {
-
-	    succ->parent->right = succ->right;
-	    succ->right->parent = succ->parent;
-	  }
-	}
-  
-	//Cleanup
-	succ->left = del->left;
+	succ->left = remove->left;
 	succ->left->parent = succ;
-	succ->right = del->right;
+	succ->right = remove->right;
 	succ->right->parent = succ;
-	succ->parent = del->parent;
-	del->left = nullptr;
-	del->right = nullptr;
-	delete del;
+	succ->parent = remove->parent;
+	
+	//Fix parents
+	if (remove->parent != nullptr) {
+
+	  if (remove->parent->left == remove) { remove->parent->left = succ; }
+	  else { remove->parent->right = succ; }
+	}
+	//Root deletion
+	else { this->head = succ; }
+
+	remove->left = nullptr;
+	remove->right = nullptr;
+
+	delete remove;
       }
     }
   }
-
+    
   void print(int indent = 0, Node* i = nullptr) {
 
+    if (this->head == nullptr) { return; }
+    
     if (i == nullptr) { i = head; }
     
     if (i->right != nullptr) { this->print(indent + 1, i->right); }
